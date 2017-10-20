@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from scipy.spatial.distance import pdist
+from scipy.spatial.distance import sqeuclidean
 
 csv_db = pd.read_csv('toy_input.csv')
 guy = pd.read_csv('toy_profile.csv')
@@ -54,7 +55,23 @@ def init_db(columns):
     df = pd.DataFrame(columns=columns)
     return df
 
-
+def match_person(df, person, threshold=0.0):
+    """
+    Finds the match for the person among people in the DB
+    :param df:
+    :param person:
+    :param threshold: maximum distance for which person if matched. if Min distance > threshold, None is returned
+    :return: name of the match or None
+    """
+    person = person.set_index([ID])
+    distances = {}
+    for row in df.iterrows():
+        name, value = row
+        distances[name] = sqeuclidean(person, value)
+    best = sorted(distances, key=distances.get)[0]
+    if distances[best] > threshold:
+        return None
+    return best
 
 
 name1, name2 = match_people(csv_db)
@@ -63,7 +80,8 @@ df = init_db(FEATURES)
 df = add_person(df, csv_db)
 df = add_person(df,guy)
 df = remove_person(df, 'cd')
-print(df)
+match = match_person(df, guy)
+print(match)
 
 
 

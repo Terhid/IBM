@@ -25,7 +25,17 @@ response = conversation.message(
     }
 )
 
-print(json.dumps(response, indent=2))
+print(json.dumps(response["input"]["text"], indent=2))
+print(json.dumps(response["output"]["text"][0], indent=2))
 
 
+response = conversation.message(
+    workspace_id = workspace_id,
+    message_input={
+        'text': 'goodbye'
+    }
+)
+
+print(json.dumps(response["input"]["text"], indent=2))
+print(json.dumps(response["output"]["text"][0], indent=2))
 

@@ -18,10 +18,9 @@ FEATURES = ['Adventurousness', 'Artistic interests', 'Emotionality', 'Imaginatio
        'Self-consciousness', 'Susceptible to stress']
 
 
-RESTAURANT = ['Fast Food', ]
-ID = 'id'
-BASE_DISCOUNT = 0.15
-MAX_DISCOUNT = 0.35
+ID = 'id' # id column
+BASE_DISCOUNT = 0.15 # disccount with no Exp points
+MAX_DISCOUNT = 0.35 # maximum Exp points
 
 
 
@@ -174,6 +173,7 @@ def get_discount(u_dict, user, BASE_DISCOUNT,MAX_DISCOUNT):
         else:
             return round(discount,2)
 
+"""
 #init data structures
 df = init_db(FEATURES)
 dict_user = {}
@@ -190,11 +190,16 @@ trump = transform_json_to_csv(trump_data, 'trump')
 trump2 = transform_json_to_csv(trump_data, 'trump2')
 
 
+# GAMIFICATION
+# Add when we get handle
+# Returns nothing, just updates a global dictionary
 add_user_to_user_dict(dict_user, trump)
 remove_user_from_user_dict(dict_user, hillary)
 add_experience(dict_user, trump, 20)
 discount = get_discount(dict_user, trump, BASE_DISCOUNT, MAX_DISCOUNT)
 
+# Matching
+# Note: returns an updated dataframe
 df = init_db(FEATURES)
 df = add_person(df, trump)
 df = remove_person(df, 'trump')
@@ -207,6 +212,7 @@ df = add_person(df, hillary)
 match, diff = match_person(df, trump)
 print(match, diff)
 print(name1, name2, feature)
+"""
 
 
 

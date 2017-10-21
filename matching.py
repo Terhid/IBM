@@ -3,6 +3,7 @@ import numpy as np
 from scipy.spatial.distance import pdist, squareform
 from scipy.spatial.distance import sqeuclidean
 from jason_transform import *
+from get_json import *
 from get_text_py import get_text_py
 
 
@@ -194,7 +195,7 @@ def get_discount(u_dict, user, BASE_DISCOUNT,MAX_DISCOUNT):
             return round(discount,2)
 
 def add_user_all(handle,PATH):
-    get_text_py(handle, name_text_output="output.txt",
+    get_json(handle, name_text_output="output.txt",
                 path_Rscript='./get_text.R')
     with open('output.json') as data_file:
         user_json = json.load(data_file)

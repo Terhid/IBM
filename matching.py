@@ -194,7 +194,7 @@ def get_discount(u_dict, user, BASE_DISCOUNT,MAX_DISCOUNT):
             return round(discount,2)
 
 def add_user_all(handle,PATH):
-    get_text_py(tweetUser="HillaryClinton", name_text_output="output.txt",
+    get_text_py(handle, name_text_output="output.txt",
                 path_Rscript='./get_text.R')
     with open('output.json') as data_file:
         user_json = json.load(data_file)

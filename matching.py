@@ -3,6 +3,8 @@ import numpy as np
 from scipy.spatial.distance import pdist, squareform
 from scipy.spatial.distance import sqeuclidean
 from jason_transform import *
+from get_text_py import get_text_py
+
 
 
 
@@ -191,6 +193,15 @@ def get_discount(u_dict, user, BASE_DISCOUNT,MAX_DISCOUNT):
             return MAX_DISCOUNT
         else:
             return round(discount,2)
+
+def add_user_all(handle,PATH):
+    get_text_py(handle, 'user.txt', 'get_text.R')
+    #call watson PI that creates a jsaon called 'user.json'
+    with open('user.json') as data_file:
+        user_json = json.load(data_file)
+    user = transform_json_to_csv(user_json, str(handle))
+    add_user_to_user_dict(dict_user, user)
+    add_person(PATH, user)
 
 #init data structures
 init_db(FEATURES, PATH)

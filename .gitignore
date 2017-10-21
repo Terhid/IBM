@@ -1,1 +1,6 @@
 .idea/
+*.swp
+**/*.swp
+__pycache__/
+**/__pycache__/
+

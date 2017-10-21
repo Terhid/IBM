@@ -195,8 +195,7 @@ def get_discount(u_dict, user, BASE_DISCOUNT,MAX_DISCOUNT):
             return round(discount,2)
 
 def add_user_all(handle,PATH):
-    get_text_py(handle, 'user.txt', 'get_text.R')
-    #call watson PI that creates a jsaon called 'user.json'
+    call_watson_PI(handle, str(handle) + 'user.json')
     with open('user.json') as data_file:
         user_json = json.load(data_file)
     user = transform_json_to_csv(user_json, str(handle))

@@ -18,4 +18,4 @@ def get_text_py(tweetUser, name_text_output, path_Rscript):
     subprocess.check_output(cmd, universal_newlines=True)
     print('ddd')
     
-#get_text_py(tweetUser= "DonaldTrump", name_text_output="trump.txt", path_Rscript='C:\\Userss\\david\\HACKATON\\get_text.R')
+get_text_py(tweetUser= "DonaldTrump", name_text_output="trump.txt", path_Rscript='C:\\Userss\\david\\HACKATON\\get_text.R')

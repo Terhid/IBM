@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from scipy.spatial.distance import pdist
+from scipy.spatial.distance import pdist, squareform
 from scipy.spatial.distance import sqeuclidean
 from jason_transform import *
 
@@ -8,7 +8,16 @@ from jason_transform import *
 
 
 
-FEATURES = ['label_1','label_2','label_3','label_4','label_5','label_6','label_7','label_8','label_9','label_10','label_11']
+FEATURES = ['Adventurousness', 'Artistic interests', 'Emotionality', 'Imagination',
+       'Intellect', 'Authority-challenging', 'Achievement striving',
+       'Cautiousness', 'Dutifulness', 'Orderliness', 'Self-discipline',
+       'Self-efficacy', 'Activity level', 'Assertiveness', 'Cheerfulness',
+       'Excitement-seeking', 'Outgoing', 'Gregariousness', 'Altruism',
+       'Cooperation', 'Modesty', 'Uncompromising', 'Sympathy', 'Trust',
+       'Fiery', 'Prone to worry', 'Melancholy', 'Immoderation',
+       'Self-consciousness', 'Susceptible to stress']
+
+
 RESTAURANT = ['Fast Food', ]
 ID = 'id'
 BASE_DISCOUNT = 0.15
@@ -16,26 +25,27 @@ MAX_DISCOUNT = 0.35
 
 
 
-def match_people(data):
+def match_people(df):
     """
     Matches people that are closest to each other in personality profile penalizing big differences more.
     Removes matched people form the dataframe
     :param csv_profile: 
     :return: names of matched people
     """
-    df = data.set_index([ID])
-    if data.empty or len(data) < 2:
+    if df.empty:
         return None, None, None
-    distances = pdist(df, metric='sqeuclidean')
-    best_match = str(np.argmax(distances))
-    index1 = int(best_match[0])
-    index2 = int(best_match[1])
+    dist = pdist(df, metric='sqeuclidean')
+    distances = squareform(dist)
+    best_match = np.amin(distances[np.nonzero(distances)])
+    itemindex = np.where(distances == best_match)
+    index1 = itemindex[0][0]
+    index2 = itemindex[1][0]
     name1 = str(df.index[index1])
     name2 = str(df.index[index2])
     feature = get_most_similar_feature(df, name1, name2)
-    df.drop(name1, axis=0, inplace=True)
-    df.drop(name2, axis=0, inplace=True)
-    return name1, name2, feature
+    df = remove_person(df, name1)
+    df = remove_person(df, name1)
+    return name1, name2, feature, df
 
 def get_most_similar_feature(data, name1, name2):
     """
@@ -56,6 +66,7 @@ def add_person(csv_db, data):
     :param csv_profile:
     :return:  None
     """
+
     csv_profile = data.set_index([ID])
     csv_db = pd.concat([csv_db, csv_profile], axis=0)
     return csv_db
@@ -161,7 +172,7 @@ def get_discount(u_dict, user, BASE_DISCOUNT,MAX_DISCOUNT):
         if discount > MAX_DISCOUNT:
             return MAX_DISCOUNT
         else:
-            return discount
+            return round(discount,2)
 
 #init data structures
 df = init_db(FEATURES)
@@ -169,33 +180,31 @@ dict_user = {}
 
 #TESTING
 
-with open('ex22.json') as data_file:
-    data = json.load(data_file)
+with open('ex44.json') as data_file:
+    hillary = json.load(data_file)
+with open('trump.json') as data_file:
+    trump_data = json.load(data_file)
 
-csv_db = transform_json_to_csv(data, 'Oprah')
-
-
-
-# csv_db = pd.read_csv('toy_input.csv')
-guy = pd.read_csv('JayZ.csv')
-girl = pd.read_csv('Donald.csv')
-print(csv_db.shape, guy.shape)
+hillary = transform_json_to_csv(hillary, 'hillary')
+trump = transform_json_to_csv(trump_data, 'trump')
+trump2 = transform_json_to_csv(trump_data, 'trump2')
 
 
-add_user_to_user_dict(dict_user, guy)
-remove_user_from_user_dict(dict_user, girl)
-add_experience(dict_user, guy, 0)
-discount = get_discount(dict_user, guy, BASE_DISCOUNT, MAX_DISCOUNT)
-print(discount)
+add_user_to_user_dict(dict_user, trump)
+remove_user_from_user_dict(dict_user, hillary)
+add_experience(dict_user, trump, 20)
+discount = get_discount(dict_user, trump, BASE_DISCOUNT, MAX_DISCOUNT)
 
-
-name1, name2, feature = match_people(csv_db)
-name = 'ad'
 df = init_db(FEATURES)
-df = add_person(df, csv_db)
-df = add_person(df,guy)
-df = remove_person(df, 'cd')
-match, diff = match_person(df, girl)
+df = add_person(df, trump)
+df = remove_person(df, 'trump')
+df = add_person(df, hillary)
+df = add_person(df, trump2)
+name1, name2, feature, df = match_people(df)
+
+df = add_person(df, hillary)
+
+match, diff = match_person(df, trump)
 print(match, diff)
 print(name1, name2, feature)
 

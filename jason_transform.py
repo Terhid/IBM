@@ -35,11 +35,7 @@ def transform_json_to_csv(data, twitter_name):
             for index in range(len(temp)):
                 new_temp = temp[index]
                 names, values = get_values(new_temp, names, values)
-    ######### end of jason data extraction =)
 
-    # create df with random data
-    #df = pd.DataFrame(np.random.random(size=(rows_to_add, len(names))), columns=names)
-    #df.loc[0] = values # put opera winfrey values here
     values.append(twitter_name)
     df = pd.DataFrame([values], columns=names + ['id'])
     return df
@@ -53,7 +49,7 @@ def get_values(dict, names, values):
 
             for x in range(len(new_val)):
                 name_var = new_val[x]["name"]
-                val_var = new_val[x]["raw_score"]
+                val_var = new_val[x]["percentile"]
                 names.append(name_var)
                 values.append(val_var)
 

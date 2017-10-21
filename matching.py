@@ -2,11 +2,15 @@ import pandas as pd
 import numpy as np
 from scipy.spatial.distance import pdist
 from scipy.spatial.distance import sqeuclidean
+from jason_transform import *
+
+
+
 
 
 FEATURES = ['label_1','label_2','label_3','label_4','label_5','label_6','label_7','label_8','label_9','label_10','label_11']
 RESTAURANT = ['Fast Food', ]
-ID = 'Name_id'
+ID = 'id'
 BASE_DISCOUNT = 0.15
 MAX_DISCOUNT = 0.35
 
@@ -20,6 +24,8 @@ def match_people(data):
     :return: names of matched people
     """
     df = data.set_index([ID])
+    if data.empty or len(data) < 2:
+        return None, None, None
     distances = pdist(df, metric='sqeuclidean')
     best_match = str(np.argmax(distances))
     index1 = int(best_match[0])
@@ -63,8 +69,10 @@ def remove_person(csv_db, name):
     :return: csv_db with name removed
     """
     name = str(name)
-    return csv_db.drop(name, axis=0)
-
+    try:
+        return csv_db.drop(name, axis=0)
+    except ValueError:
+        return csv_db
 
 def init_db(columns):
     """
@@ -161,9 +169,17 @@ dict_user = {}
 
 #TESTING
 
-csv_db = pd.read_csv('toy_input.csv')
-guy = pd.read_csv('toy_profile.csv')
-girl = pd.read_csv('toy_prof2.csv')
+with open('ex22.json') as data_file:
+    data = json.load(data_file)
+
+csv_db = transform_json_to_csv(data, 'Oprah')
+
+
+
+# csv_db = pd.read_csv('toy_input.csv')
+guy = pd.read_csv('JayZ.csv')
+girl = pd.read_csv('Donald.csv')
+print(csv_db.shape, guy.shape)
 
 
 add_user_to_user_dict(dict_user, guy)

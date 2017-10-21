@@ -4,7 +4,6 @@ import sys
 
 class Watson:
 
-
     def __init__(self):
         self.conversation = ConversationV1(
             username='d1fe3542-a6e8-44d6-bb09-9981011100f2',
@@ -37,7 +36,9 @@ class Watson:
     # extracts the twitter handle, matches with a user, sends it in variable $match
     def next_context_1211(self, old_context): # thanks for twitter
         twitter_handle = old_context["twitter_handle"]
-        matches = {"@cesar": "@mauro", "@david": "@wojtek"}
+        matches = {"@cesar": "@mauro", "@david": "@wojtek", "@mauro": "@cesar",
+                "@mauro": "@donaldtrump", "@hillary": "@donaldtrump",
+                "@BarackObama": "@donaldtrump"}
         new_context = old_context
         new_context["match"] = matches[twitter_handle]
         return new_context
@@ -60,7 +61,8 @@ class Watson:
         self.node_id = self.rec_context["node_id"]
         print("The node id is " + str(self.rec_context["node_id"]))
         print("The context is " + str(self.rec_context.keys()))
-        return(json.dumps(response["output"]["text"][0], indent=2))
+        answer = "\n".join([r for r in response["output"]["text"]])
+        return(answer)
 
 
 

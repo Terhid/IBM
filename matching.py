@@ -22,16 +22,19 @@ RESTAURANT = ['Fast Food', ]
 ID = 'id'
 BASE_DISCOUNT = 0.15
 MAX_DISCOUNT = 0.35
+PATH = 'db.csv'
 
 
 
-def match_people(df):
+def match_people(path):
     """
     Matches people that are closest to each other in personality profile penalizing big differences more.
     Removes matched people form the dataframe
     :param csv_profile: 
     :return: names of matched people
     """
+    df = pd.read_csv(path)
+    df.set_index(['Unnamed: 0'], inplace=True)
     if df.empty:
         return None, None, None
     dist = pdist(df, metric='sqeuclidean')
@@ -43,9 +46,10 @@ def match_people(df):
     name1 = str(df.index[index1])
     name2 = str(df.index[index2])
     feature = get_most_similar_feature(df, name1, name2)
-    df = remove_person(df, name1)
-    df = remove_person(df, name1)
-    return name1, name2, feature, df
+    remove_person(path, name1)
+    remove_person(path, name1)
+    df.to_csv(path)
+    return name1, name2, feature
 
 def get_most_similar_feature(data, name1, name2):
     """
@@ -59,41 +63,50 @@ def get_most_similar_feature(data, name1, name2):
     feature = diff.idxmin(axis=1)
     return feature
 
-def add_person(csv_db, data):
+def add_person(path, data):
     """
     add csv_profile to csv_db. can add more than one profile
     :param csv_db:
     :param csv_profile:
     :return:  None
     """
-
+    csv_db = pd.read_csv(path)
+    csv_db.set_index(['Unnamed: 0'], inplace=True)
+    if 'Unnamed: 0.1' in csv_db.columns:
+        del csv_db['Unnamed: 0.1']
     csv_profile = data.set_index([ID])
     csv_db = pd.concat([csv_db, csv_profile], axis=0)
-    return csv_db
+    csv_db.to_csv(path)
+    return None
 
 
-def remove_person(csv_db, name):
+def remove_person(path, name):
     """
     Removes given name from csv_db
     :param csv_db:
     :param name:
     :return: csv_db with name removed
     """
+    csv_db = pd.read_csv(path)
+    csv_db.set_index(['Unnamed: 0'], inplace=True)
+    if 'Unnamed: 0.1' in csv_db.columns:
+        del csv_db['Unnamed: 0.1']
     name = str(name)
     try:
-        return csv_db.drop(name, axis=0)
+        csv_db.drop(name, axis=0).to_csv(path)
     except ValueError:
-        return csv_db
+        csv_db.to_csv(path)
 
-def init_db(columns):
+
+def init_db(columns, path):
     """
-    :return: empty db
+    :return: None
     """
     df = pd.DataFrame(columns=columns)
-    return df
+    df.to_csv(path)
 
 
-def match_person(df, person, threshold=0.0):
+def match_person(path, person, threshold=0.0):
     """
     Finds the match for the person among people in the DB
     :param df:
@@ -101,6 +114,11 @@ def match_person(df, person, threshold=0.0):
     :param threshold: maximum distance for which person if matched. if Min distance > threshold, None is returned
     :return: name of the match or None
     """
+    df = pd.read_csv(path)
+
+    df.set_index(['Unnamed: 0'], inplace=True)
+    if 'Unnamed: 0.1' in df.columns:
+        del df['Unnamed: 0.1']
     person = person.set_index([ID])
     distances = {}
     if df.empty:
@@ -109,7 +127,7 @@ def match_person(df, person, threshold=0.0):
         name, value = row
         distances[name] = sqeuclidean(person, value)
     best = sorted(distances, key=distances.get)[0]
-    if distances[best] > threshold:
+    if distances[best] < threshold:
         return None, None
     diff = abs(person - value)
     feature = diff.idxmin(axis=1)[0]
@@ -175,7 +193,7 @@ def get_discount(u_dict, user, BASE_DISCOUNT,MAX_DISCOUNT):
             return round(discount,2)
 
 #init data structures
-df = init_db(FEATURES)
+init_db(FEATURES, PATH)
 dict_user = {}
 
 #TESTING
@@ -195,16 +213,16 @@ remove_user_from_user_dict(dict_user, hillary)
 add_experience(dict_user, trump, 20)
 discount = get_discount(dict_user, trump, BASE_DISCOUNT, MAX_DISCOUNT)
 
-df = init_db(FEATURES)
-df = add_person(df, trump)
-df = remove_person(df, 'trump')
-df = add_person(df, hillary)
-df = add_person(df, trump2)
-name1, name2, feature, df = match_people(df)
 
-df = add_person(df, hillary)
+add_person(PATH, trump)
+remove_person(PATH, 'trump')
+add_person(PATH, hillary)
+add_person(PATH, trump2)
+name1, name2, feature = match_people(PATH)
 
-match, diff = match_person(df, trump)
+add_person(PATH, hillary)
+
+match, diff = match_person(PATH, trump)
 print(match, diff)
 print(name1, name2, feature)
 
